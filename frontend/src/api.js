@@ -1,5 +1,5 @@
 // Small fetch wrapper for the Spring Boot REST API (proxied through Vite at /api).
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const TOKEN_KEY = 'ab_token';
 
 export class ApiError extends Error {
@@ -38,7 +38,8 @@ async function request(path, { method = 'GET', body } = {}) {
 
   let res;
   try {
-    res = await fetch(`/api${path}`, {
+res = await fetch(`${API_BASE_URL}/api${path}`,
+ {
       method,
       headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
