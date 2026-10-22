@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AutoBridge Lite - Smart Vehicle Management System" />
+    <title>AutoBridge Lite</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230C1E4F'/%3E%3Cpath d='M12 40c0-5 4-8 10-9l8-8c2-2 4-3 7-3h8c3 0 6 2 8 5l3 6c3 1 4 3 4 6v3H12z' fill='%2386A8CF'/%3E%3Ccircle cx='24' cy='44' r='5' fill='%230C1E4F'/%3E%3Ccircle cx='46' cy='44' r='5' fill='%230C1E4F'/%3E%3C/svg%3E" />
+    <script>
+      // Apply the saved theme before first paint to avoid a flash.
+      try {
+        var t = localStorage.getItem('ab_theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
