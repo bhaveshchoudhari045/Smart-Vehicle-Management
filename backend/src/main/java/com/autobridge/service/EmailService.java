@@ -2,21 +2,23 @@
 package com.autobridge.service;
 
 import com.autobridge.model.Enquiry;
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private final Resend resend;
 
-    @Value("${app.mail.from}")
+    @Value("${app.mail.from:onboarding@resend.dev}")
     private String fromEmail;
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
+    public EmailService(@Value("${RESEND_API_KEY}") String apiKey) {
+        this.resend = new Resend(apiKey);
     }
 
     public void sendConfirmation(Enquiry enquiry) {
@@ -56,17 +58,21 @@ public class EmailService {
 
     private void sendEmail(String to, String subject, String body) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(body);
+            CreateEmailOptions params = CreateEmailOptions.builder()
+                    .from(fromEmail)
+                    .to(to)
+                    .subject(subject)
+                    .text(body)
+                    .build();
 
-            mailSender.send(message);
-            System.out.println("Email sent successfully to: " + to);
+            CreateEmailResponse response = resend.emails().send(params);
+            System.out.println("Resend accepted email to: " + to
+                    + ", email ID: " + response.getId());
 
+        } catch (ResendException e) {
+            System.err.println("Resend email failed: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Failed to send email: " + e.getMessage());
+            System.err.println("Unexpected email error: " + e.getMessage());
         }
     }
 }
