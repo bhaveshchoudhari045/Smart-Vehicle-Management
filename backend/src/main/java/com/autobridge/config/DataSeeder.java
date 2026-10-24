@@ -50,7 +50,7 @@ public class DataSeeder implements CommandLineRunner {
 
         users.save(new User("Meera Kulkarni", "manufacturer@autobridge.com",
                 encoder.encode("Maker@123"), Role.MANUFACTURER));
-        users.save(new User("Rohan Deshmukh", "bhavesh341377@gmail.com",
+        users.save(new User("Rohan Deshmukh", "showroom@autobridge.com",
                 encoder.encode("Show@123"), Role.SHOWROOM));
         User customer = users.save(new User("Aarav Mehta", "customer@autobridge.com",
                 encoder.encode("Buyer@123"), Role.CUSTOMER));
