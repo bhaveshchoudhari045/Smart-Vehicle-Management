@@ -88,7 +88,7 @@ class AutoBridgeApplicationTests {
 
     @Test
     void showroomCanReceiveDelivery() throws Exception {
-        String token = login("showroom@autobridge.com", "Show@123");
+        String token = login("bhavesh341377@gmail.com", "Show@123");
         mvc.perform(post("/api/inventory/1/delivery").header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON).content("{\"quantity\":2}"))
                 .andExpect(status().isOk());
