@@ -33,6 +33,18 @@ public class Enquiry {
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private EnquiryAvailability availability = EnquiryAvailability.PENDING;
+
+    @Column(length = 1000)
+    private String showroomResponse;
+
+    @Column(length = 100)
+    private String expectedWait;
+
+
     public Enquiry() {
     }
 
@@ -59,4 +71,29 @@ public class Enquiry {
     public void setMessage(String message) { this.message = message; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    
+    public EnquiryAvailability getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(EnquiryAvailability availability) {
+        this.availability = availability;
+    }
+
+    public String getShowroomResponse() {
+        return showroomResponse;
+    }
+
+    public void setShowroomResponse(String showroomResponse) {
+        this.showroomResponse = showroomResponse;
+    }
+
+    public String getExpectedWait() {
+        return expectedWait;
+    }
+
+    public void setExpectedWait(String expectedWait) {
+        this.expectedWait = expectedWait;
+    }
+
 }
