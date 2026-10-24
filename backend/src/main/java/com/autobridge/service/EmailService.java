@@ -9,6 +9,9 @@ import com.resend.services.emails.model.CreateEmailResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class EmailService {
 
@@ -22,38 +25,78 @@ public class EmailService {
     }
 
     public void sendConfirmation(Enquiry enquiry) {
-        String subject = "AutoBridge Lite - Enquiry Received";
+        String subject = "AutoBridge Lite | Enquiry Received";
 
         String body = "Hello " + enquiry.getCustomer().getFullName() + ",\n\n"
-                + "Your enquiry has been received successfully.\n\n"
-                + "Vehicle: " + enquiry.getVehicle().getBrand()
-                + " " + enquiry.getVehicle().getModel() + "\n"
+                + "Thank you for contacting AutoBridge Lite. Your enquiry has been received.\n\n"
+                + "ENQUIRY DETAILS\n"
+                + "------------------------------\n"
+                + "Vehicle: " + vehicleName(enquiry) + "\n"
                 + "Enquiry Type: " + enquiry.getType() + "\n"
-                + "Current Status: " + enquiry.getStatus() + "\n\n"
-                + "The showroom will review your enquiry and update you.\n\n"
+                + "Status: " + enquiry.getStatus() + "\n\n"
+                + "The showroom will review your request. We will notify you when there is an update.\n\n"
                 + "Regards,\nAutoBridge Lite Team";
 
         sendEmail(enquiry.getCustomer().getEmail(), subject, body);
     }
 
     public void sendStatusUpdate(Enquiry enquiry) {
-        String subject = "AutoBridge Lite - Enquiry Status Update";
+        String subject = "AutoBridge Lite | Showroom Response - " + vehicleName(enquiry);
 
-        String body = "Hello " + enquiry.getCustomer().getFullName() + ",\n\n"
-                + "Your enquiry has been updated.\n\n"
-                + "Vehicle: " + enquiry.getVehicle().getBrand()
-                + " " + enquiry.getVehicle().getModel() + "\n"
-                + "Status: " + enquiry.getStatus() + "\n\n"
-                + "Availability: " + enquiry.getAvailability() + "\n"
-                + "Showroom Response: "
-                + (enquiry.getShowroomResponse() == null
-                   ? "No additional message" : enquiry.getShowroomResponse())
-                + "\nExpected Waiting Time: "
-                + (enquiry.getExpectedWait() == null
-                   ? "Not specified" : enquiry.getExpectedWait())
-                + "\n\nRegards,\nAutoBridge Lite Team";
+        List<String> lines = new ArrayList<>();
+        lines.add("Hello " + enquiry.getCustomer().getFullName() + ",");
+        lines.add("");
+        lines.add("The showroom has updated your enquiry. Please see the latest details below.");
+        lines.add("");
+        lines.add("SHOWROOM UPDATE");
+        lines.add("------------------------------");
+        lines.add("Vehicle: " + vehicleName(enquiry));
+        lines.add("Enquiry Type: " + enquiry.getType());
+        lines.add("Enquiry Status: " + enquiry.getStatus());
 
-        sendEmail(enquiry.getCustomer().getEmail(), subject, body);
+        if (enquiry.getAvailability() != null) {
+            lines.add("Vehicle Availability: " + formatAvailability(
+                    enquiry.getAvailability().name()));
+        }
+
+        if (hasText(enquiry.getShowroomResponse())) {
+            lines.add("");
+            lines.add("Message from the showroom:");
+            lines.add(enquiry.getShowroomResponse().trim());
+        }
+
+        if (hasText(enquiry.getExpectedWait())) {
+            lines.add("");
+            lines.add("Expected Waiting Time: " + enquiry.getExpectedWait().trim());
+        }
+
+        lines.add("");
+        lines.add("Regards,");
+        lines.add("AutoBridge Lite Team");
+
+        sendEmail(
+                enquiry.getCustomer().getEmail(),
+                subject,
+                String.join("\n", lines));
+    }
+
+    private String vehicleName(Enquiry enquiry) {
+        return enquiry.getVehicle().getBrand() + " "
+                + enquiry.getVehicle().getModel();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private String formatAvailability(String value) {
+        return switch (value) {
+            case "AVAILABLE" -> "Available";
+            case "WAITING" -> "Waiting";
+            case "NOT_AVAILABLE" -> "Not available";
+            case "PENDING" -> "Pending confirmation";
+            default -> value;
+        };
     }
 
     private void sendEmail(String to, String subject, String body) {
