@@ -24,6 +24,9 @@ public class User {
     @Column(nullable = false, length = 20)
     private Role role;
 
+    @Column(length = 100)
+    private String showroomName;
+
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
@@ -46,6 +49,8 @@ public class User {
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    public String getShowroomName() { return showroomName; }
+    public void setShowroomName(String showroomName) { this.showroomName = showroomName; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 }

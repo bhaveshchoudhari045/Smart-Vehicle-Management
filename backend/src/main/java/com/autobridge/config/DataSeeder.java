@@ -41,10 +41,36 @@ public class DataSeeder implements CommandLineRunner {
         this.encoder = encoder;
     }
 
+    
+private void updateExistingVehicleImages() {
+    List<Vehicle> existingVehicles = vehicles.findAll();
+    int updated = 0;
+
+    for (Vehicle vehicle : existingVehicles) {
+        String image = VehicleImageCatalog.getImage(
+                vehicle.getBrand(), vehicle.getModel());
+
+        if (image != null && !image.isBlank()
+                && !image.equals(vehicle.getImageUrl())) {
+            vehicle.setImageUrl(image);
+            updated++;
+        }
+    }
+
+    if (updated > 0) {
+        vehicles.saveAll(existingVehicles);
+        log.info("Updated images for {} existing vehicles", updated);
+    }
+}
+
+
     @Override
     public void run(String... args) {
+        updateExistingVehicleImages();
+
         if (users.count() > 0) {
-            return;
+                ensureShowroomAccounts();
+                return;
         }
         log.info("Empty database detected - loading demo data");
 
@@ -52,6 +78,7 @@ public class DataSeeder implements CommandLineRunner {
                 encoder.encode("Maker@123"), Role.MANUFACTURER));
         users.save(new User("Rohan Deshmukh", "showroom@autobridge.com",
                 encoder.encode("Show@123"), Role.SHOWROOM));
+        ensureShowroomAccounts();
         User customer = users.save(new User("Aarav Mehta", "customer@autobridge.com",
                 encoder.encode("Buyer@123"), Role.CUSTOMER));
         User priya = users.save(new User("Priya Nair", "priya.nair@example.com",
@@ -153,5 +180,38 @@ public class DataSeeder implements CommandLineRunner {
         String image = "https://loremflickr.com/900/600/" + imageKeywords + "?lock=" + Math.abs(brand.hashCode() % 97 + model.hashCode() % 89);
         return new Vehicle(brand, model, 2025, category, fuel, transmission, price, engine, description,
                 image, available);
+    }
+
+    private void ensureShowroomAccounts() {
+        ensureShowroomAccount(
+                "Rohan Deshmukh", "showroom@autobridge.com",
+                "Show@123", "Navi Mumbai Hub");
+        ensureShowroomAccount(
+                "Thane Showroom", "thane.showroom@autobridge.com",
+                "Thane@123", "Thane Central Showroom");
+        ensureShowroomAccount(
+                "Pune Showroom", "pune.showroom@autobridge.com",
+                "Pune@123", "Pune Premium Motors");
+    }
+
+    private void ensureShowroomAccount(
+            String name, String email, String password, String showroomName) {
+        User account = users.findByEmailIgnoreCase(email).orElse(null);
+
+        if (account == null) {
+            account = new User(name, email, encoder.encode(password), Role.SHOWROOM);
+            account.setShowroomName(showroomName);
+            users.save(account);
+            log.info("Created showroom account for {}", showroomName);
+            return;
+        }
+
+        if (account.getRole() == Role.SHOWROOM
+                && (account.getShowroomName() == null
+                || account.getShowroomName().isBlank())) {
+            account.setShowroomName(showroomName);
+            users.save(account);
+            log.info("Assigned existing showroom account to {}", showroomName);
+        }
     }
 }

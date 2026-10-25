@@ -92,6 +92,18 @@ export const api = {
   deleteVehicle: (id) => request(`/vehicles/${id}`, { method: "DELETE" }),
 
   inventory: () => request("/inventory"),
+
+  supplyRequests: () => request("/supply-requests"),
+  createSupplyRequest: (vehicleId, quantity) =>
+    request("/supply-requests", { method: "POST", body: { vehicleId, quantity } }),
+  acceptSupplyRequest: (id) =>
+    request(`/supply-requests/${id}/accept`, { method: "POST" }),
+  rejectSupplyRequest: (id) =>
+    request(`/supply-requests/${id}/reject`, { method: "POST" }),
+  dispatchSupplyRequest: (id) =>
+    request(`/supply-requests/${id}/dispatch`, { method: "POST" }),
+  confirmSupplyDelivery: (id) =>
+    request(`/supply-requests/${id}/deliver`, { method: "POST" }),
   receiveDelivery: (id, quantity) =>
     request(`/inventory/${id}/delivery`, {
       method: "POST",
