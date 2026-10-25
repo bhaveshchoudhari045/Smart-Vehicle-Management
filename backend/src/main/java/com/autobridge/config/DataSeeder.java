@@ -173,14 +173,21 @@ private void updateExistingVehicleImages() {
         log.info("Demo data loaded: {} users, {} vehicles", users.count(), vehicles.count());
     }
 
-    private static Vehicle vehicle(String brand, String model, String category, String fuel, String transmission,
-                                   long price, String engine, String description, String imageKeywords,
-                                   boolean available) {
-        // Placeholder photo by keyword; the UI falls back to a drawn illustration if it cannot load.
-        String image = "https://loremflickr.com/900/600/" + imageKeywords + "?lock=" + Math.abs(brand.hashCode() % 97 + model.hashCode() % 89);
-        return new Vehicle(brand, model, 2025, category, fuel, transmission, price, engine, description,
-                image, available);
+    
+private static Vehicle vehicle(String brand, String model, String category, String fuel, String transmission,
+                               long price, String engine, String description, String imageKeywords,
+                               boolean available) {
+    String image = VehicleImageCatalog.getImage(brand, model);
+
+    if (image == null || image.isBlank()) {
+        image = "https://loremflickr.com/900/600/" + imageKeywords
+                + "?lock=" + Math.abs(brand.hashCode() % 97 + model.hashCode() % 89);
     }
+
+    return new Vehicle(brand, model, 2025, category, fuel, transmission, price, engine, description,
+            image, available);
+}
+
 
     private void ensureShowroomAccounts() {
         ensureShowroomAccount(
